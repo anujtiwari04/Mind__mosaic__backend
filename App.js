@@ -184,7 +184,10 @@ app.post('/api/posts/:postId/comments', authenticate, async (req, res) => {
 
 
 
-
+// Add this line near the end, before app.listen()
+app.get("/", (req, res) => {
+  res.send("MindMosaic Backend is Running 🚀");
+});
 
 
 
