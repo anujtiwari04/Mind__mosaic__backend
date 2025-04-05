@@ -13,7 +13,7 @@ const PORT = process.env.PORT || 5000;
 // Middleware
 app.use(
   cors({
-    origin: ["https://yourmindmosaic.vercel.app/", "http://localhost:5173"], // Allow both localhost and IP
+    origin: ["https://yourmindmosaic.vercel.app", "http://localhost:5173"], // Allow both localhost and IP
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
     // allowedHeaders: ["Content-Type", "Authorization"],
