@@ -3,22 +3,27 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const bodyParser = require("body-parser");
-const User = require("./models/User"); // Ensure this path matches your actual User model location
+const User = require("./models/User");
 const jwt = require('jsonwebtoken');
 const Post = require('./models/Post');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Middleware
-app.use(
-  cors({
-    origin: ["https://yourmindmosaic.vercel.app", "http://localhost:5173"], // Allow both localhost and IP
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    credentials: true,
-    // allowedHeaders: ["Content-Type", "Authorization"],
-  })
-);
+// Enhanced CORS configuration
+const corsOptions = {
+  origin: ["https://yourmindmosaic.vercel.app", "http://localhost:5173"],
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  credentials: true,
+  allowedHeaders: ["Content-Type", "Authorization"]
+};
+
+// Apply CORS middleware
+app.use(cors(corsOptions));
+
+// Handle preflight requests
+app.options('*', cors(corsOptions));
+
 app.use(bodyParser.json());
 
 // Connect to MongoDB
