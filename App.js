@@ -13,7 +13,7 @@ const PORT = process.env.PORT || 5000;
 // Middleware
 app.use(
   cors({
-    origin: ["https://yourmindmosaic.vercel.app/", "http://127.0.0.1:5173"], // Allow both localhost and IP
+    origin: ["https://yourmindmosaic.vercel.app/", "http://127.0.0.1:5173", "http://localhost:5173"], // Allow both localhost and IP
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
     // allowedHeaders: ["Content-Type", "Authorization"],
@@ -46,7 +46,6 @@ const authenticate = (req, res, next) => {
   }
 };
 
-
 // Signup API
 app.post("/api/auth/register", async (req, res) => {
   try {
@@ -64,12 +63,26 @@ app.post("/api/auth/register", async (req, res) => {
     // Create new user
     const newUser = new User({ username, email, password });
     await newUser.save();
-    
-    res.status(201).json({ message: "User registered successfully" });
+
+    // Generate JWT token
+    const token = jwt.sign(
+      { userId: newUser._id, username: newUser.username }, // Payload
+      process.env.JWT_SECRET, // Secret key
+      { expiresIn: "1h" } // Token expiration
+    );
+
+    // Send response with token
+    res.status(201).json({
+      message: "User registered successfully",
+      token: token,
+      username: newUser.username,
+    });
   } catch (error) {
+    console.error("Signup error:", error);
     res.status(500).json({ message: "Internal server error", error });
   }
 });
+
 
 // Login API
 app.post("/api/auth/login", async (req, res) => {
@@ -128,7 +141,7 @@ app.get('/api/fetchPosts', async (req, res) => {
   }
 });
 
-// post posts
+// POST posts
 app.post('/api/posts', authenticate, async (req, res) => {
   try {
     const { content, isAnonymous } = req.body;
@@ -150,6 +163,8 @@ app.post('/api/posts', authenticate, async (req, res) => {
   }
 });
 
+
+//POST comment
 app.post('/api/posts/:postId/comments', authenticate, async (req, res) => {
   try {
     const { content, isAnonymous } = req.body;
@@ -194,8 +209,8 @@ app.get("/", (req, res) => {
 
 
 
-// app.listen(PORT, () => {
-//   console.log(`Server is running on port ${PORT}`);
-// });
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
 module.exports = app;
 
